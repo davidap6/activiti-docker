@@ -1,0 +1,36 @@
+services:
+  activiti-db:
+    image: postgres:9.5.13
+    container_name:  activiti-db
+    environment:
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: sa
+      POSTGRES_DB: activiti
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - activiti-net
+  activiti-app:
+     build: .
+     container_name: activiti-app
+     ports:
+       - "8080:8080"
+     depends_on:
+       - activiti-db
+     environment:
+       - ACTIVITI_DATABASE_TYPE=postgres
+       - ACTIVITI_DATABASE_HOST=activiti-db
+       - ACTIVITI_DATABASE_PORT=5432
+       - ACTIVITI_DATABASE_NAME=activiti
+       - ACTIVITI_DATABASE_USERNAME=sa
+       - ACTIVITI_DATABASE_PASSWORD=sa
+     networks:
+       - activiti-net
+
+volumes:
+  postgres_data:
+networks:
+  activiti-net:
+    driver: bridge
